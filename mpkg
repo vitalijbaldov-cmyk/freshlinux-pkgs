@@ -15,6 +15,10 @@ fetch() {
 }
 index_path() { printf '%s/index.txt' "$MPKG_CACHE"; }
 is_installed() { [ -d "$MPKG_DB/installed/$1" ]; }
+write_files() {
+    name="$1"; file="$2"
+    tar -tzf "$file" | grep -v '^\.mpkginfo$' | grep -v '/$' | sed 's|^\./||' > "$MPKG_DB/installed/$name/FILES"
+}
 cmd_update() {
     mkdir -p "$MPKG_CACHE"
     msg "updating index: $MPKG_REPO/index.txt"
@@ -54,7 +58,7 @@ install_one() {
     tar -xzf "$file" -C "$MPKG_ROOT"
     mkdir -p "$MPKG_DB/installed/$name"
     cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
-    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' | sed 's|^\./||' > "$MPKG_DB/installed/$name/FILES" ) || true
+    ( cd "$MPKG_ROOT" && write_files "$name" "$file" ) || true
     cp "$MPKG_ROOT/.mpkginfo" "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
     rm -f "$MPKG_ROOT/.mpkginfo"
 }
@@ -66,9 +70,7 @@ cmd_remove() {
         f="$MPKG_DB/installed/$p/FILES"
         if [ -f "$f" ]; then
             while IFS= read -r x; do
-                case "$x" in
-                    ""|"."|".."|"./"|"../") continue;;
-                esac
+                [ -z "$x" ] && continue
                 rm -f "$MPKG_ROOT/$x"
             done < "$f"
         fi
@@ -91,7 +93,7 @@ cmd_local_install() {
     [ -n "$name" ] || die "no name in .mpkginfo"
     mkdir -p "$MPKG_DB/installed/$name"
     cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
-    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' | sed 's|^\./||' > "$MPKG_DB/installed/$name/FILES" ) || true
+    ( cd "$MPKG_ROOT" && write_files "$name" "$file" ) || true
     tar -xzf "$file" -O .mpkginfo > "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
     rm -f "$MPKG_ROOT/.mpkginfo"
     msg "$name installed from file"
