@@ -1,15 +1,13 @@
 #!/bin/sh
 # mpkg 0.1 — FreshLinux package manager
 set -eu
-: "${MPKG_REPO:=https://raw.githubusercontent.com/vitalijbaldov-cmyk/freshlinux-pkgs/main}"
+: "${MPKG_REPO:=https://raw.githubusercontent.com/vitalijbaldov-cmyk/freshlinux-pkgs/master}"
 : "${MPKG_ROOT:=/}"
 : "${MPKG_DB:=/var/lib/mpkg}"
 : "${MPKG_CACHE:=/var/cache/mpkg}"
-
 msg() { printf 'mpkg: %s\n' "$*" >&2; }
 die() { msg "$*"; exit 1; }
 need_root() { [ "$(id -u)" = 0 ] || die "need root"; }
-
 fetch() {
     if command -v curl >/dev/null 2>&1; then curl -fsSL -o "$2" "$1"
     elif command -v wget >/dev/null 2>&1; then wget -q -O "$2" "$1"
@@ -17,7 +15,6 @@ fetch() {
 }
 index_path() { printf '%s/index.txt' "$MPKG_CACHE"; }
 is_installed() { [ -d "$MPKG_DB/installed/$1" ]; }
-
 cmd_update() {
     mkdir -p "$MPKG_CACHE"
     msg "updating index: $MPKG_REPO/index.txt"
@@ -26,7 +23,6 @@ cmd_update() {
     msg "ok"
 }
 index_lookup() { [ -f "$(index_path)" ] || return 1; awk -v p="$1" '$1==p {print; exit}' "$(index_path)"; }
-
 install_one() {
     pkg="$1"
     is_installed "$pkg" && { msg "$pkg already installed"; return 0; }
@@ -35,13 +31,18 @@ install_one() {
     set -- $line
     name=$1; ver=$2; arch=$3; url=$4; sha=$5; deps=$6
     shift 6 2>/dev/null || true
+    if [ "$url" = "-" ]; then
+        msg "$name already installed"
+        mkdir -p "$MPKG_DB/installed/$name"
+        return 0
+    fi
     if [ "$deps" != "-" ] && [ -n "$deps" ]; then
         old=$IFS; IFS=','
         for d in $deps; do IFS=$old; install_one "$d"; IFS=','; done
         IFS=$old
     fi
     file="$MPKG_CACHE/$name-$ver.tar.gz"
-    if [ ! -f "$file" ] && [ "$url" != "-" ]; then
+    if [ ! -f "$file" ]; then
         msg "downloading $name-$ver"
         fetch "$url" "$file"
     fi
@@ -53,19 +54,24 @@ install_one() {
     tar -xzf "$file" -C "$MPKG_ROOT"
     mkdir -p "$MPKG_DB/installed/$name"
     cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
-    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' > "$MPKG_DB/installed/$name/FILES" ) || true
+    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' | sed 's|^\./||' > "$MPKG_DB/installed/$name/FILES" ) || true
     cp "$MPKG_ROOT/.mpkginfo" "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
     rm -f "$MPKG_ROOT/.mpkginfo"
 }
-
 cmd_install() { need_root; [ -f "$(index_path)" ] || cmd_update; for p in "$@"; do install_one "$p"; done; }
-
 cmd_remove() {
     need_root
     for p in "$@"; do
         is_installed "$p" || die "$p not installed"
         f="$MPKG_DB/installed/$p/FILES"
-        [ -f "$f" ] && while IFS= read -r x; do [ -n "$x" ] && rm -f "$MPKG_ROOT/$x"; done < "$f"
+        if [ -f "$f" ]; then
+            while IFS= read -r x; do
+                case "$x" in
+                    ""|"."|".."|"./"|"../") continue;;
+                esac
+                rm -f "$MPKG_ROOT/$x"
+            done < "$f"
+        fi
         rm -rf "$MPKG_DB/installed/$p"
         msg "$p removed"
     done
@@ -85,7 +91,7 @@ cmd_local_install() {
     [ -n "$name" ] || die "no name in .mpkginfo"
     mkdir -p "$MPKG_DB/installed/$name"
     cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
-    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' > "$MPKG_DB/installed/$name/FILES" ) || true
+    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' | sed 's|^\./||' > "$MPKG_DB/installed/$name/FILES" ) || true
     tar -xzf "$file" -O .mpkginfo > "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
     rm -f "$MPKG_ROOT/.mpkginfo"
     msg "$name installed from file"
