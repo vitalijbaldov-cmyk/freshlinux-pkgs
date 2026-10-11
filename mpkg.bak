@@ -1,0 +1,114 @@
+#!/bin/sh
+# mpkg 0.1 — FreshLinux package manager
+set -eu
+: "${MPKG_REPO:=https://raw.githubusercontent.com/vitalijbaldov-cmyk/freshlinux-pkgs/main}"
+: "${MPKG_ROOT:=/}"
+: "${MPKG_DB:=/var/lib/mpkg}"
+: "${MPKG_CACHE:=/var/cache/mpkg}"
+
+msg() { printf 'mpkg: %s\n' "$*" >&2; }
+die() { msg "$*"; exit 1; }
+need_root() { [ "$(id -u)" = 0 ] || die "need root"; }
+
+fetch() {
+    if command -v curl >/dev/null 2>&1; then curl -fsSL -o "$2" "$1"
+    elif command -v wget >/dev/null 2>&1; then wget -q -O "$2" "$1"
+    else die "no curl/wget"; fi
+}
+index_path() { printf '%s/index.txt' "$MPKG_CACHE"; }
+is_installed() { [ -d "$MPKG_DB/installed/$1" ]; }
+
+cmd_update() {
+    mkdir -p "$MPKG_CACHE"
+    msg "updating index: $MPKG_REPO/index.txt"
+    fetch "$MPKG_REPO/index.txt" "$(index_path).new"
+    mv "$(index_path).new" "$(index_path)"
+    msg "ok"
+}
+index_lookup() { [ -f "$(index_path)" ] || return 1; awk -v p="$1" '$1==p {print; exit}' "$(index_path)"; }
+
+install_one() {
+    pkg="$1"
+    is_installed "$pkg" && { msg "$pkg already installed"; return 0; }
+    line=$(index_lookup "$pkg") || die "no index"
+    [ -n "$line" ] || die "package $pkg not found"
+    set -- $line
+    name=$1; ver=$2; arch=$3; url=$4; sha=$5; deps=$6
+    shift 6 2>/dev/null || true
+    if [ "$deps" != "-" ] && [ -n "$deps" ]; then
+        old=$IFS; IFS=','
+        for d in $deps; do IFS=$old; install_one "$d"; IFS=','; done
+        IFS=$old
+    fi
+    file="$MPKG_CACHE/$name-$ver.tar.gz"
+    if [ ! -f "$file" ] && [ "$url" != "-" ]; then
+        msg "downloading $name-$ver"
+        fetch "$url" "$file"
+    fi
+    if [ "$sha" != "-" ]; then
+        a=$(sha256sum "$file" | awk '{print $1}')
+        [ "$a" = "$sha" ] || die "sha256 mismatch $name"
+    fi
+    msg "unpacking $name-$ver"
+    tar -xzf "$file" -C "$MPKG_ROOT"
+    mkdir -p "$MPKG_DB/installed/$name"
+    cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
+    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' > "$MPKG_DB/installed/$name/FILES" ) || true
+    cp "$MPKG_ROOT/.mpkginfo" "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
+    rm -f "$MPKG_ROOT/.mpkginfo"
+}
+
+cmd_install() { need_root; [ -f "$(index_path)" ] || cmd_update; for p in "$@"; do install_one "$p"; done; }
+
+cmd_remove() {
+    need_root
+    for p in "$@"; do
+        is_installed "$p" || die "$p not installed"
+        f="$MPKG_DB/installed/$p/FILES"
+        [ -f "$f" ] && while IFS= read -r x; do [ -n "$x" ] && rm -f "$MPKG_ROOT/$x"; done < "$f"
+        rm -rf "$MPKG_DB/installed/$p"
+        msg "$p removed"
+    done
+}
+cmd_search() { [ -f "$(index_path)" ] || cmd_update; grep -i -- "$1" "$(index_path)" || true; }
+cmd_list() {
+    [ -d "$MPKG_DB/installed" ] || return 0
+    for d in "$MPKG_DB/installed"/*/; do [ -d "$d" ] || continue; basename "$d"; done
+}
+cmd_local_install() {
+    need_root
+    file="$1"
+    [ -f "$file" ] || die "no file: $file"
+    msg "installing from file: $file"
+    tar -xzf "$file" -C "$MPKG_ROOT"
+    name=$(tar -xzf "$file" -O .mpkginfo 2>/dev/null | awk -F= '$1=="name"{print $2}')
+    [ -n "$name" ] || die "no name in .mpkginfo"
+    mkdir -p "$MPKG_DB/installed/$name"
+    cp "$file" "$MPKG_DB/installed/$name/.tar.gz"
+    ( cd "$MPKG_ROOT" && tar -tzf "$file" | grep -v '^\.mpkginfo' > "$MPKG_DB/installed/$name/FILES" ) || true
+    tar -xzf "$file" -O .mpkginfo > "$MPKG_DB/installed/$name/.mpkginfo" 2>/dev/null || true
+    rm -f "$MPKG_ROOT/.mpkginfo"
+    msg "$name installed from file"
+}
+usage() { cat <<EOF
+mpkg — FreshLinux package manager
+  update                 update index
+  install <pkg>...       install from repo
+  local-install <file>   install .tar.gz locally
+  remove  <pkg>...       remove
+  search  <q>            search
+  list                   list installed
+EOF
+}
+[ $# -ge 1 ] || { usage; exit 1; }
+c="$1"; shift
+case "$c" in
+    update)        cmd_update ;;
+    install)       cmd_install "$@" ;;
+    local-install) cmd_local_install "$@" ;;
+    remove)        cmd_remove "$@" ;;
+    search)        cmd_search "$@" ;;
+    list)          cmd_list ;;
+    -h|--help|help) usage ;;
+    *) die "unknown command: $c" ;;
+esac
