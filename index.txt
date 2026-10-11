@@ -1,4 +1,26 @@
-freshlinux-base 0.1 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.1/freshlinux-base-0.1.tar.gz b209c9bed6e3d46c6919d64e9f599643f7472253e9025244c3271197e076af01 musl,busybox,runit FreshLinux base system
-musl 1.2.5 x86_64 - - - musl libc
-busybox 1.36.1 x86_64 - - - BusyBox
-runit 2.1.2 x86_64 - - - runit init
+brotli-libs 1.1.0-r2 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/brotli-libs-1.1.0-r2.tar.gz 7e846fd5e7e817eedb756edfe42fecbccad2b2aa70734936b09806dba72e2805 - brotli-libs
+ca-certificates 20260413-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/ca-certificates-20260413-r0.tar.gz 44ccd059687490ebf8bf0e3c95de3637205d92f7517ec628c9c24cf4b6e19f6f - ca-certificates
+c-ares 1.33.1-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/c-ares-1.33.1-r0.tar.gz 02f2efdb595137f063487369730c8c059144a43d9b1ff9dc64af47de15dd1a97 - c-ares
+curl 8.14.1-r2 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/curl-8.14.1-r2.tar.gz bd60ea2a43856de1e9bad6059189ee67e6d44dcb206e03eb066e5efeb6e5acda - curl
+freshlinux-base 0.1 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/freshlinux-base-0.1.tar.gz 50e0523437422e62991a9fce951f8c4e04fa7e08b3aee2c0b50a27cda1f5525e - freshlinux-base
+git 2.45.4-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/git-2.45.4-r0.tar.gz bb7aea4e86c34348f703d50840c1842f26d3c73003f930c911c7d974f587ac81 - git
+git-init-template 2.45.4-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/git-init-template-2.45.4-r0.tar.gz 71fcd27ea2127566971fede723fc7a6d05e93e8058dc5065bca8ad82f1e06d36 - git-init-template
+libcrypto3 3.3.7-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libcrypto3-3.3.7-r0.tar.gz 827bbe6fcd40ee7a525d888bc0d69cc34e16ba57f467848f0fd8e01f3963e75e - libcrypto3
+libcurl 8.14.1-r2 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libcurl-8.14.1-r2.tar.gz 402441194d4027d31acc14bb9666486e1b2f195fdfc53f9f28ac01c96ccffc93 - libcurl
+libexpat 2.8.1-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libexpat-2.8.1-r0.tar.gz b12df0907ac272fe6bad4ae9810da477f6d3e476ffc2131aa71908029284e12b - libexpat
+libidn2 2.3.7-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libidn2-2.3.7-r0.tar.gz d459718da8f4b69186ea5f1d8bf6810b1254fce3fbd745501a7efa65642e4888 - libidn2
+libncursesw 6.4_p20240420-r2 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libncursesw-6.4_p20240420-r2.tar.gz 5d24e75205f525ed1f9662ddf1a2eff610932a26079bbfc574ba2da669544b2f - libncursesw
+libpsl 0.21.5-r1 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libpsl-0.21.5-r1.tar.gz e3ddc39e7fd7f6ee5fcde667a8b4447782fa36a5a1f221ed698c400fde12bc43 - libpsl
+libssl3 3.3.7-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libssl3-3.3.7-r0.tar.gz edc08af1bf4d5b74499d4f45ade1197ce62546c306c1f97cbf92d918b683af22 - libssl3
+libunistring 1.2-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/libunistring-1.2-r0.tar.gz cb9504ec261fb633739f6888914fa1f033fb6798adaa3b5cc1381a8f22284057 - libunistring
+mpkg 0.1 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/mpkg-0.1.tar.gz 01d5061b664cc22229c48f827f5f7f13c199a7899dc01edf7b6961842741849c - mpkg
+nano 8.0-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/nano-8.0-r0.tar.gz f19465c0d8991520f5bbae34c35b5d2fcaa5846f3f7cc3cd7b74742c8c9b194c - nano
+ncurses-terminfo-base 6.4_p20240420-r2 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/ncurses-terminfo-base-6.4_p20240420-r2.tar.gz 87fd2d08fade110248d4d407a4c37f1bad805544e77401ec15c028a161ccbf52 - ncurses-terminfo-base
+nghttp2-libs 1.62.1-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/nghttp2-libs-1.62.1-r0.tar.gz 72cee4d183e79f4a1bf50190e11683b0373a69014417186ae81e40a443ff2db3 - nghttp2-libs
+pcre2 10.43-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/pcre2-10.43-r0.tar.gz 388f50f29f999b64dd97e4ab1452595969d970f67b8d09f4edf8c88f7297ee6f - pcre2
+vim 9.1.0707-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/vim-9.1.0707-r0.tar.gz 439caedb4164481f80394a9a94ce1e598db269740e900dc19a9d130ae23662ac - vim
+vim-common 9.1.0707-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/vim-common-9.1.0707-r0.tar.gz b0372d9a15873c6c93bae817cd5cce015b40f89ee80ec66c9798043d3e739e01 - vim-common
+wget 1.24.5-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/wget-1.24.5-r0.tar.gz 93be91b5377e8cd2a3a903919c2bc7e85c8526af31a49aeae811561af1ec91d8 - wget
+xxd 9.1.0707-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/xxd-9.1.0707-r0.tar.gz 2291d8e194c455f4b4edfc3489a1c0ddf2cb31da553f97209baac6db19c0779d - xxd
+zlib 1.3.2-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/zlib-1.3.2-r0.tar.gz 736965c39e24b4862b5aff3a8291d847de51648c0614968253f48447959dfcec - zlib
+zstd-libs 1.5.6-r0 x86_64 https://github.com/vitalijbaldov-cmyk/freshlinux-pkgs/releases/download/v0.2/zstd-libs-1.5.6-r0.tar.gz 9e5261a5eb8c1578515c2bc5dc8ff1397609bcda16b2575827791c33baf60dfa - zstd-libs
